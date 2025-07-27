@@ -1,134 +1,146 @@
 export interface Scam {
-  id: string;
+  _id?: string;
+  id?: string;
   title: string;
-  type: string;
+  summary: string; // Changed from description
   tags: string[];
-  detectionTips: string[];
-  fraudScore: number;
   platform: string[];
-  origin?: string;
-  verifiedSource?: string;
-  description: string;
+  regions: string[]; // Changed from origin
+  sourceUrls?: string[]; // Changed from verifiedSource
+  fraudScore: number;
+  detectionTips: string[];
+  createdAt: string;
+  updatedAt: string;
 }
 
-export const mockScams: Scam[] = [
-  {
-    id: "1",
-    title: "Fake Investment App - 'QuickProfit Pro'",
-    type: "Investment Fraud",
-    tags: ["#CryptoTrap", "#FakeApp", "#InvestmentFraud"],
-    detectionTips: [
-      "App not available on official Play Store/App Store",
-      "Promises guaranteed 20-30% weekly returns",
-      "Asks for KYC documents upfront before showing any investments",
-      "Customer support only via WhatsApp or Telegram"
-    ],
-    fraudScore: 95,
-    platform: ["Android APK", "WhatsApp"],
-    origin: "Delhi, Mumbai",
-    verifiedSource: "https://example.com/rbi-warning",
-    description: "Fake trading app that steals user documents and deposits"
-  },
-  {
-    id: "2", 
-    title: "WhatsApp Loan Approval Scam",
-    type: "Loan Fraud",
-    tags: ["#LoanFraud", "#WhatsAppScam", "#UPIFraud"],
-    detectionTips: [
-      "Instant loan approval without credit check",
-      "Asks for processing fee via UPI before loan disbursal",
-      "Uses fake RBI/Bank logos in messages",
-      "Contact number not linked to any official bank"
-    ],
-    fraudScore: 88,
-    platform: ["WhatsApp", "UPI Apps"],
-    origin: "Rajasthan, UP",
-    description: "Scammers pose as loan officers promising instant personal loans"
-  },
-  {
-    id: "3",
-    title: "Flipkart Job Offer Email Scam", 
-    type: "Employment Fraud",
-    tags: ["#JobScam", "#Phishing", "#EmailFraud"],
-    detectionTips: [
-      "Email from non-official domain (@flipkart-jobs.com instead of @flipkart.com)",
-      "Asks for registration fee for 'guaranteed' job placement",
-      "Poor grammar and spelling in official communications",
-      "Promises work-from-home with unrealistic salary packages"
-    ],
-    fraudScore: 72,
-    platform: ["Email", "WhatsApp"],
-    origin: "Bangalore, Hyderabad",
-    verifiedSource: "https://example.com/flipkart-warning",
-    description: "Fake recruitment emails targeting job seekers with lucrative offers"
-  },
-  {
-    id: "4",
-    title: "OTP Banking Fraud Call",
-    type: "Banking Scam", 
-    tags: ["#BankingFraud", "#OTPScam", "#Phishing"],
-    detectionTips: [
-      "Caller claims to be from bank's fraud prevention team",
-      "Creates urgency by saying account will be blocked",
-      "Asks to share OTP to 'secure' the account",
-      "May have some personal details to sound legitimate"
-    ],
-    fraudScore: 85,
-    platform: ["Phone Call", "SMS"],
-    origin: "Multiple states",
-    description: "Fraudsters call pretending to be bank officials to steal OTPs and access accounts"
-  },
-  {
-    id: "5",
-    title: "Government Subsidy WhatsApp Forward",
-    type: "Government Scheme Fraud",
-    tags: ["#GovernmentScam", "#WhatsAppScam", "#SubsidyFraud"],
-    detectionTips: [
-      "Claims PM announced new subsidy scheme not covered by news",
-      "Asks to click suspicious links to register",
-      "Requests Aadhar and bank details for 'verification'",
-      "Messages forwarded in family groups to build trust"
-    ],
-    fraudScore: 67,
-    platform: ["WhatsApp", "Fake Websites"],
-    origin: "Rural areas, Small cities",
-    description: "Fake government scheme announcements targeting rural populations"
-  },
-  {
-    id: "6",
-    title: "Cryptocurrency Investment Telegram Group",
-    type: "Crypto Fraud",
-    tags: ["#CryptoTrap", "#TelegramScam", "#InvestmentFraud"],
-    detectionTips: [
-      "Admin posts fake trading screenshots showing huge profits",
-      "New members must pay 'signal fee' to get trading tips",
-      "Claims to have insider information about upcoming coins",
-      "Promotes unknown exchanges or wallets"
-    ],
-    fraudScore: 91,
-    platform: ["Telegram", "Unknown Crypto Exchanges"],
-    origin: "International/Online",
-    description: "Telegram groups luring people into crypto investment scams with fake profit proofs"
-  }
+// Updated tag categories to match the comprehensive dataset
+export const ALL_TAGS = [
+  // Job Scams
+  'JobScam', 'FakeJobOffer', 'EmploymentFraud', 'WorkFromHome', 'RecruitmentFraud', 'DataEntryFraud',
+  
+  // Loan Scams
+  'LoanFraud', 'UPIFraud', 'Harassment', 'FakeDocuments', 'BankingFraud', 'WebsiteFraud',
+  
+  // Banking Frauds
+  'OTPScam', 'Phishing', 'NetBankingFraud', 'CardFraud', 'Skimming', 'SMSFraud',
+  
+  // Investment Scams
+  'CryptoFraud', 'InvestmentScam', 'PonziScheme', 'CryptoTrap', 'StockScam', 'ICOFraud', 'CryptoScam', 'MutualFundFraud',
+  
+  // Romance Scams
+  'RomanceFraud', 'RomanceScam', 'PigButchering', 'MarriageFraud', 'GiftFraud',
+  
+  // Digital Arrest Scams
+  'DigitalArrest', 'FakePolice', 'ImpersonationFraud', 'CustomsFraud', 'LegalFraud', 'InterpolFraud',
+  
+  // Major Ponzi Scheme tags
+  'SaradhaScam', 'RoseValleyScam', 'PACLScam', 'FalconScam', 'WebworkScam', 'ChitFund', 'LandInvestmentFraud', 'ClickEarningFraud',
+  
+  // Phishing and Email Fraud tags
+  'Phishing', 'EmailFraud', 'IDTheft', 'GovernmentFraud', 'Smishing', 'SIMClosure', 'IndiaPostScam', 'LegalNoticeScam', 'EmailSecurity',
+  
+  // Loan Fraud tags
+  'LoanFraud', 'AppFraud', 'ChineseAppScam', 'Blackmail', 'AppExtortion', 'AppScam', 'Harassment', 'InternationalScam', 'DataHarvest',
+  
+  // Additional tags
+  'BankFraud', 'IdentityTheft', 'SocialEngineering', 'AdvanceFee', 'OnlineFraud', 'CredentialTheft', 'PaymentFraud', 'Extortion'
 ];
 
-export const searchScams = (query: string, scams: Scam[] = mockScams): Scam[] => {
+// Tag categories with emojis and descriptions
+export const TAG_CATEGORIES = {
+  'JobScam': { emoji: '💼', color: 'blue', description: 'Fake job offers and employment scams' },
+  'LoanFraud': { emoji: '💰', color: 'red', description: 'Loan and advance-fee scams' },
+  'PonziScheme': { emoji: '🎪', color: 'darkred', description: 'Ponzi and pyramid schemes' },
+  'BankingFraud': { emoji: '🏦', color: 'purple', description: 'Banking and OTP frauds' },
+  'CryptoFraud': { emoji: '₿', color: 'orange', description: 'Cryptocurrency investment scams' },
+  'RomanceFraud': { emoji: '💔', color: 'pink', description: 'Romance and pig-butchering scams' },
+  'DigitalArrest': { emoji: '🚔', color: 'darkblue', description: 'Police impersonation scams' },
+  'Phishing': { emoji: '🎣', color: 'yellow', description: 'Phishing and credential theft' },
+  'UPIFraud': { emoji: '📱', color: 'green', description: 'UPI payment frauds' }
+};
+
+// No mock data - data will be fetched from backend
+export const mockScams: Scam[] = [];
+
+// Utility functions for client-side filtering and processing
+export const searchScams = (scams: Scam[], query: string): Scam[] => {
   if (!query.trim()) return scams;
 
-  const normalizedQuery = query.toLowerCase();
-  
+  const searchTerm = query.toLowerCase();
   return scams.filter(scam => 
-    scam.title.toLowerCase().includes(normalizedQuery) ||
-    scam.type.toLowerCase().includes(normalizedQuery) ||
-    scam.description.toLowerCase().includes(normalizedQuery) ||
-    scam.tags.some(tag => tag.toLowerCase().includes(normalizedQuery)) ||
-    scam.platform.some(platform => platform.toLowerCase().includes(normalizedQuery)) ||
-    scam.detectionTips.some(tip => tip.toLowerCase().includes(normalizedQuery))
+    scam.title.toLowerCase().includes(searchTerm) ||
+    scam.summary.toLowerCase().includes(searchTerm) ||
+    scam.tags.some(tag => tag.toLowerCase().includes(searchTerm)) ||
+    scam.platform.some(platform => platform.toLowerCase().includes(searchTerm)) ||
+    scam.regions.some(region => region.toLowerCase().includes(searchTerm))
   );
 };
 
-export const filterScamsByTag = (tag: string, scams: Scam[] = mockScams): Scam[] => {
+export const filterScamsByTags = (scams: Scam[], selectedTags: string[]): Scam[] => {
+  if (selectedTags.length === 0) return scams;
+  
   return scams.filter(scam => 
-    scam.tags.some(scamTag => scamTag.toLowerCase() === tag.toLowerCase())
+    selectedTags.some(tag => scam.tags.includes(tag))
   );
+};
+
+export const filterScamsByFraudScore = (scams: Scam[], minScore: number, maxScore: number): Scam[] => {
+  return scams.filter(scam => 
+    scam.fraudScore >= minScore && scam.fraudScore <= maxScore
+  );
+};
+
+export const sortScams = (scams: Scam[], sortBy: 'date' | 'fraudScore' | 'title'): Scam[] => {
+  const sortedScams = [...scams];
+  
+  switch (sortBy) {
+    case 'date':
+      return sortedScams.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    case 'fraudScore':
+      return sortedScams.sort((a, b) => b.fraudScore - a.fraudScore);
+    case 'title':
+      return sortedScams.sort((a, b) => a.title.localeCompare(b.title));
+    default:
+      return sortedScams;
+  }
+};
+
+export const getFraudLevel = (score: number): { level: string; color: string; bgColor: string } => {
+  if (score >= 80) return { level: 'High Risk', color: 'text-red-600', bgColor: 'bg-red-100' };
+  if (score >= 60) return { level: 'Medium Risk', color: 'text-yellow-600', bgColor: 'bg-yellow-100' };
+  return { level: 'Low Risk', color: 'text-green-600', bgColor: 'bg-green-100' };
+};
+
+export const getTrendingScams = (scams: Scam[], limit: number = 5): Scam[] => {
+  return scams
+    .sort((a, b) => b.fraudScore - a.fraudScore)
+    .slice(0, limit);
+};
+
+export const getScamStats = (scams: Scam[]) => {
+  const totalScams = scams.length;
+  const highRiskScams = scams.filter(scam => scam.fraudScore >= 80).length;
+  const totalViews = 0; // Not in new schema
+  const totalReports = 0; // Not in new schema
+
+  return {
+    totalScams,
+    highRiskScams,
+    totalViews,
+    totalReports
+  };
+};
+
+export const getTagStats = (scams: Scam[]) => {
+  const tagCounts: { [key: string]: number } = {};
+  
+  scams.forEach(scam => {
+    scam.tags.forEach(tag => {
+      tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+    });
+  });
+  
+  return Object.entries(tagCounts)
+    .map(([tag, count]) => ({ tag, count }))
+    .sort((a, b) => b.count - a.count);
 };

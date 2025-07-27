@@ -169,7 +169,7 @@ export const AddScamForm = ({ onClose, onSubmit }: AddScamFormProps) => {
   );
 
   return (
-    <div className="min-h-screen bg-background p-4 pb-20">
+    <div className="min-h-screen bg-white p-4 pb-20">
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Header with enhanced animations */}
         <Card className="bg-gradient-card shadow-paypal border-0 animate-fade-in">
@@ -208,7 +208,7 @@ export const AddScamForm = ({ onClose, onSubmit }: AddScamFormProps) => {
         </Card>
 
         {/* Main Form with enhanced styling */}
-        <Card className="shadow-card border-border/50 animate-slide-up">
+        <Card className="shadow-paypal border-paypal-blue-light animate-slide-up">
           <CardContent className="p-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Scam Name with tooltip */}
@@ -221,7 +221,7 @@ export const AddScamForm = ({ onClose, onSubmit }: AddScamFormProps) => {
                   placeholder="e.g., Fake investment app promising 20% returns"
                   value={formData.title}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  className="h-12 rounded-xl border-border/50 focus:border-paypal-blue focus:ring-paypal-blue/20 transition-all duration-300"
+                  className="h-12 rounded-xl border-paypal-blue-light focus:border-paypal-blue focus:ring-paypal-blue/20 transition-all duration-300"
                 />
               </div>
 
@@ -235,7 +235,7 @@ export const AddScamForm = ({ onClose, onSubmit }: AddScamFormProps) => {
                   placeholder="Describe how the scam works, what they promise, how they contact victims..."
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  className="min-h-[120px] rounded-xl border-border/50 focus:border-paypal-blue focus:ring-paypal-blue/20 resize-none transition-all duration-300"
+                  className="min-h-[120px] rounded-xl border-paypal-blue-light focus:border-paypal-blue focus:ring-paypal-blue/20 resize-none transition-all duration-300"
                 />
               </div>
 
@@ -267,7 +267,7 @@ export const AddScamForm = ({ onClose, onSubmit }: AddScamFormProps) => {
                   <HelpTooltip content="Select the state where this scam was reported" />
                 </div>
                 <Select value={formData.location} onValueChange={(value) => setFormData(prev => ({ ...prev, location: value }))}>
-                  <SelectTrigger className="h-12 rounded-xl border-border/50 focus:border-paypal-blue transition-all duration-300">
+                  <SelectTrigger className="h-12 rounded-xl border-paypal-blue-light focus:border-paypal-blue transition-all duration-300">
                     <SelectValue placeholder="Select state or city" />
                   </SelectTrigger>
                   <SelectContent className="max-h-48">
@@ -289,13 +289,13 @@ export const AddScamForm = ({ onClose, onSubmit }: AddScamFormProps) => {
                     placeholder="Paste link to evidence or news article"
                     value={formData.evidence}
                     onChange={(e) => setFormData(prev => ({ ...prev, evidence: e.target.value }))}
-                    className="flex-1 h-12 rounded-xl border-border/50 focus:border-paypal-blue transition-all duration-300"
+                    className="flex-1 h-12 rounded-xl border-paypal-blue-light focus:border-paypal-blue transition-all duration-300"
                   />
                   <Button 
                     type="button" 
                     variant="outline" 
                     onClick={handleImageUpload}
-                    className={`h-12 px-4 rounded-xl border-border/50 transition-all duration-300 ${
+                    className={`h-12 px-4 rounded-xl border-paypal-blue-light transition-all duration-300 ${
                       imageUploaded ? 'bg-success/10 border-success text-success' : ''
                     }`}
                   >
@@ -329,7 +329,7 @@ export const AddScamForm = ({ onClose, onSubmit }: AddScamFormProps) => {
                     placeholder="Add custom tag"
                     value={customTag}
                     onChange={(e) => setCustomTag(e.target.value)}
-                    className="flex-1 h-10 rounded-xl border-border/50"
+                    className="flex-1 h-10 rounded-xl border-paypal-blue-light"
                     onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddCustomTag())}
                   />
                   <Button type="button" variant="outline" size="sm" onClick={handleAddCustomTag} className="rounded-xl">

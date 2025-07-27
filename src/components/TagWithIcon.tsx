@@ -15,54 +15,40 @@ export const TagWithIcon = ({ tag, selected, onToggle, onRemove, showRemove = fa
 
   const getTagStyle = (tagName: string) => {
     const tagLower = tagName.toLowerCase();
+    
+    // All tags now use purple blue color scheme
+    const purpleStyle = {
+      icon: '🏷️',
+      bgClass: selected ? 'bg-purple-500 text-white border-purple-500' : 'bg-purple-500/10 text-purple-600 border-purple-500/30',
+      hoverClass: 'hover:bg-purple-500 hover:text-white hover:border-purple-500',
+      shadowClass: selected ? 'shadow-lg shadow-purple-500/25' : ''
+    };
+
+    // Assign specific icons based on tag type
     if (tagLower.includes('loan') || tagLower.includes('lending')) {
-      return {
-        icon: '🧾',
-        bgClass: selected ? 'bg-tag-loan text-white border-tag-loan' : 'bg-tag-loan/10 text-tag-loan border-tag-loan/30',
-        hoverClass: 'hover:bg-tag-loan hover:text-white hover:border-tag-loan',
-        shadowClass: selected ? 'shadow-lg shadow-tag-loan/25' : ''
-      };
+      return { ...purpleStyle, icon: '🧾' };
     }
     if (tagLower.includes('phishing') || tagLower.includes('fake')) {
-      return {
-        icon: '🎣',
-        bgClass: selected ? 'bg-tag-phishing text-black border-tag-phishing' : 'bg-tag-phishing/10 text-tag-phishing border-tag-phishing/30',
-        hoverClass: 'hover:bg-tag-phishing hover:text-black hover:border-tag-phishing',
-        shadowClass: selected ? 'shadow-lg shadow-tag-phishing/25' : ''
-      };
+      return { ...purpleStyle, icon: '🎣' };
     }
     if (tagLower.includes('job') || tagLower.includes('employment')) {
-      return {
-        icon: '💼',
-        bgClass: selected ? 'bg-tag-job text-white border-tag-job' : 'bg-tag-job/10 text-tag-job border-tag-job/30',
-        hoverClass: 'hover:bg-tag-job hover:text-white hover:border-tag-job',
-        shadowClass: selected ? 'shadow-lg shadow-tag-job/25' : ''
-      };
+      return { ...purpleStyle, icon: '💼' };
     }
     if (tagLower.includes('crypto') || tagLower.includes('bitcoin') || tagLower.includes('investment')) {
-      return {
-        icon: '🪙',
-        bgClass: selected ? 'bg-tag-crypto text-white border-tag-crypto' : 'bg-tag-crypto/10 text-tag-crypto border-tag-crypto/30',
-        hoverClass: 'hover:bg-tag-crypto hover:text-white hover:border-tag-crypto',
-        shadowClass: selected ? 'shadow-lg shadow-tag-crypto/25' : ''
-      };
+      return { ...purpleStyle, icon: '🪙' };
+    }
+    if (tagLower.includes('whatsapp')) {
+      return { ...purpleStyle, icon: '💬' };
+    }
+    if (tagLower.includes('upi')) {
+      return { ...purpleStyle, icon: '💳' };
     }
     if (tagLower.includes('offer') || tagLower.includes('deal') || tagLower.includes('shopping')) {
-      return {
-        icon: '🛍️',
-        bgClass: selected ? 'bg-tag-fake-offer text-white border-tag-fake-offer' : 'bg-tag-fake-offer/10 text-tag-fake-offer border-tag-fake-offer/30',
-        hoverClass: 'hover:bg-tag-fake-offer hover:text-white hover:border-tag-fake-offer',
-        shadowClass: selected ? 'shadow-lg shadow-tag-fake-offer/25' : ''
-      };
+      return { ...purpleStyle, icon: '🛍️' };
     }
     
     // Default style
-    return {
-      icon: '🏷️',
-      bgClass: selected ? 'bg-primary text-primary-foreground border-primary' : 'bg-primary/10 text-primary border-primary/30',
-      hoverClass: 'hover:bg-primary hover:text-primary-foreground hover:border-primary',
-      shadowClass: selected ? 'shadow-lg shadow-primary/25' : ''
-    };
+    return purpleStyle;
   };
 
   const tagStyle = getTagStyle(tag);

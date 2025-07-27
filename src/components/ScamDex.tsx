@@ -1,225 +1,317 @@
-import { useState } from "react";
-import { SearchInterface } from "./SearchInterface";
-import { ScamCard } from "./ScamCard";
-import { AddScamForm } from "./AddScamForm";
-import { mockScams, searchScams, filterScamsByTag, type Scam } from "@/data/mockScams";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Shield, TrendingUp, Users, Database, Moon, Sun } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import React, { useState, useEffect } from 'react';
+import { SearchInterface } from './SearchInterface';
+import { ScamCard } from './ScamCard';
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Shield, Database, TrendingUp, AlertTriangle, X, Loader2 } from 'lucide-react';
+import { Scam, searchScams, filterScamsByTags, filterScamsByFraudScore, sortScams, getScamStats, getTrendingScams, ALL_TAGS } from '../data/mockScams';
+import { apiService, ScamStats } from '../services/api';
+import { useToast } from '../hooks/use-toast';
 
-export const ScamDex = () => {
+export const ScamDex: React.FC = () => {
+  const [scams, setScams] = useState<Scam[]>([]);
+  const [filteredScams, setFilteredScams] = useState<Scam[]>([]);
+  const [stats, setStats] = useState<ScamStats>({
+    totalScams: 0,
+    highRiskScams: 0,
+    totalViews: 0,
+    totalReports: 0
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [severityRange, setSeverityRange] = useState({ min: 1, max: 10 });
+  const [sortBy, setSortBy] = useState<'date' | 'fraudScore' | 'title'>('date');
   const { toast } = useToast();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filteredScams, setFilteredScams] = useState<Scam[]>(mockScams);
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [activeFilter, setActiveFilter] = useState<string | null>(null);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Fetch data from backend
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Fetch scams and stats in parallel
+        const [scamsResponse, statsResponse] = await Promise.all([
+          apiService.getScams(),
+          apiService.getScamStats()
+        ]);
+        
+        setScams(scamsResponse.scams);
+        setStats(statsResponse);
+        setFilteredScams(scamsResponse.scams);
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError('Failed to load scam data. Please try again later.');
+        toast({
+          title: "Error",
+          description: "Failed to load scam data. Please check your connection.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Apply filters and search
+  useEffect(() => {
+    let filtered = scams;
+
+    // Apply search
+    if (searchQuery) {
+      filtered = searchScams(filtered, searchQuery);
+    }
+
+    // Apply tag filters
+    if (selectedTags.length > 0) {
+      filtered = filterScamsByTags(filtered, selectedTags);
+    }
+
+    // Apply fraud score filter
+    filtered = filterScamsByFraudScore(filtered, severityRange.min * 10, severityRange.max * 10);
+
+    // Apply sorting
+    filtered = sortScams(filtered, sortBy);
+
+    setFilteredScams(filtered);
+  }, [scams, searchQuery, selectedTags, severityRange, sortBy]);
 
   const handleSearch = (query: string) => {
-    const results = searchScams(query);
-    setFilteredScams(results);
-    setActiveFilter(null);
-    
-    if (results.length === 0) {
-      toast({
-        title: "No Results Found",
-        description: "Try different keywords or check our popular categories.",
-      });
-    }
+    setSearchQuery(query);
   };
 
-  const handleFilterByTag = (tag: string) => {
-    const results = filterScamsByTag(tag);
-    setFilteredScams(results);
-    setActiveFilter(tag);
-    setSearchQuery("");
+  const handleTagSelect = (tag: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
   };
 
-  const handleAddScam = () => {
-    setShowAddForm(true);
+  const handleClearFilters = () => {
+    setSearchQuery('');
+    setSelectedTags([]);
+    setSeverityRange({ min: 1, max: 10 });
+    setSortBy('date');
   };
 
-  const handleSubmitScam = (scamData: any) => {
-    // In a real app, this would submit to a backend
-    console.log("New scam submitted:", scamData);
-  };
-
-  const handleReportSimilar = () => {
+  const handleReportSimilar = (scamId: string) => {
     toast({
-      title: "Report Similar Scam",
-      description: "Thank you for helping keep the community safe. Your report has been submitted.",
+      title: "Report Submitted",
+      description: "Thank you for reporting a similar scam. Our team will review it.",
     });
   };
 
-  const clearFilters = () => {
-    setFilteredScams(mockScams);
-    setActiveFilter(null);
-    setSearchQuery("");
-  };
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle('dark');
-  };
-
-  const stats = {
-    totalScams: mockScams.length,
-    highRiskScams: mockScams.filter(s => s.fraudScore >= 80).length,
-    verifiedReports: mockScams.filter(s => s.verifiedSource).length,
-  };
-
-  if (showAddForm) {
-    return (
-      <div className="min-h-screen bg-background p-4">
-        <div className="max-w-4xl mx-auto">
-          <AddScamForm 
-            onClose={() => setShowAddForm(false)}
-            onSubmit={handleSubmitScam}
-          />
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <Shield className="w-8 h-8 text-primary" />
-                <div>
-                  <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                    ScamDex 2.0
-                  </h1>
-                  <p className="text-sm text-muted-foreground">Smart Scam Search Engine for India</p>
-                </div>
+      <header className="border-b border-border bg-card shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-6">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="p-2 bg-gradient-primary rounded-xl shadow-sm">
+                <Shield className="text-white w-8 h-8" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-primary">
+                  ScamDex 2.0
+                </h1>
+                <p className="text-sm text-muted-foreground font-medium">
+                  Smart Scam Search Engine for India
+                </p>
               </div>
             </div>
-            <Button variant="ghost" size="icon" onClick={toggleTheme}>
-              {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </Button>
+            {/* Removed dark mode toggle button */}
           </div>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        {/* Stats Bar */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-card rounded-lg p-4 shadow-card border border-border/50">
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        {/* Loading State */}
+        {loading && (
+          <div className="flex items-center justify-center py-20">
             <div className="flex items-center gap-3">
-              <Database className="w-8 h-8 text-primary" />
-              <div>
-                <p className="text-2xl font-bold text-card-foreground">{stats.totalScams}</p>
-                <p className="text-sm text-muted-foreground">Total Scams Tracked</p>
-              </div>
+              <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              <span className="text-lg text-muted-foreground">Loading scam data...</span>
             </div>
-          </div>
-          <div className="bg-card rounded-lg p-4 shadow-card border border-border/50">
-            <div className="flex items-center gap-3">
-              <TrendingUp className="w-8 h-8 text-danger" />
-              <div>
-                <p className="text-2xl font-bold text-card-foreground">{stats.highRiskScams}</p>
-                <p className="text-sm text-muted-foreground">High Risk Alerts</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-card rounded-lg p-4 shadow-card border border-border/50">
-            <div className="flex items-center gap-3">
-              <Users className="w-8 h-8 text-success" />
-              <div>
-                <p className="text-2xl font-bold text-card-foreground">{stats.verifiedReports}</p>
-                <p className="text-sm text-muted-foreground">Verified Reports</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Search Interface */}
-        <div className="mb-8">
-          <SearchInterface
-            onSearch={handleSearch}
-            onAddScam={handleAddScam}
-            onFilterByTag={handleFilterByTag}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-          />
-        </div>
-
-        {/* Active Filters */}
-        {(activeFilter || searchQuery) && (
-          <div className="flex items-center gap-3 mb-6">
-            <span className="text-sm text-muted-foreground">Active filters:</span>
-            {activeFilter && (
-              <Badge variant="default" className="gap-2">
-                {activeFilter}
-              </Badge>
-            )}
-            {searchQuery && (
-              <Badge variant="secondary" className="gap-2">
-                Search: "{searchQuery}"
-              </Badge>
-            )}
-            <Button variant="ghost" size="sm" onClick={clearFilters}>
-              Clear all
-            </Button>
           </div>
         )}
 
-        {/* Results Summary */}
-        <div className="flex items-center justify-between mb-6">
-          <p className="text-muted-foreground">
-            Showing {filteredScams.length} scam{filteredScams.length !== 1 ? 's' : ''}
-            {activeFilter && ` in ${activeFilter}`}
-            {searchQuery && ` matching "${searchQuery}"`}
-          </p>
-        </div>
-
-        {/* Scam Cards Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {filteredScams.map((scam) => (
-            <ScamCard
-              key={scam.id}
-              title={scam.title}
-              type={scam.type}
-              tags={scam.tags}
-              detectionTips={scam.detectionTips}
-              fraudScore={scam.fraudScore}
-              platform={scam.platform}
-              origin={scam.origin}
-              verifiedSource={scam.verifiedSource}
-              onReport={handleReportSimilar}
-            />
-          ))}
-        </div>
-
-        {/* Empty State */}
-        {filteredScams.length === 0 && (
-          <div className="text-center py-12">
-            <Shield className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-xl font-semibold mb-2">No Scams Found</h3>
-            <p className="text-muted-foreground mb-4">
-              No scams match your search criteria. Try different keywords or explore our categories.
-            </p>
-            <Button variant="secondary" onClick={clearFilters}>
-              View All Scams
-            </Button>
+        {/* Error State */}
+        {error && !loading && (
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <AlertTriangle className="w-12 h-12 text-danger mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-foreground mb-2">Failed to Load Data</h3>
+              <p className="text-muted-foreground mb-4">{error}</p>
+              <Button onClick={() => window.location.reload()}>
+                Try Again
+              </Button>
+            </div>
           </div>
+        )}
+
+        {/* Content - only show when not loading and no error */}
+        {!loading && !error && (
+          <>
+            {/* Search Interface */}
+            <SearchInterface 
+              onSearch={handleSearch}
+              onTagSelect={handleTagSelect}
+              selectedTags={selectedTags}
+              allTags={ALL_TAGS}
+            />
+
+            {/* Active Filters */}
+            {(searchQuery || selectedTags.length > 0 || severityRange.min > 1 || severityRange.max < 10) && (
+              <div className="flex flex-wrap items-center gap-3 mb-8">
+                <span className="text-sm text-muted-foreground font-medium">Active Filters:</span>
+                
+                {searchQuery && (
+                  <Badge className="bg-primary text-primary-foreground">
+                    Search: "{searchQuery}"
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="ml-2 h-auto p-0 text-primary-foreground hover:text-primary-foreground"
+                      onClick={() => setSearchQuery('')}
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
+                  </Badge>
+                )}
+                
+                {selectedTags.map(tag => (
+                  <Badge key={tag} className="bg-muted text-muted-foreground">
+                    {tag}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="ml-2 h-auto p-0 text-muted-foreground hover:text-foreground"
+                      onClick={() => handleTagSelect(tag)}
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
+                  </Badge>
+                ))}
+                
+                {(severityRange.min > 1 || severityRange.max < 10) && (
+                  <Badge className="bg-gray-100 text-gray-700">
+                    Severity: {severityRange.min}-{severityRange.max}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="ml-2 h-auto p-0 text-gray-600 hover:text-gray-800"
+                      onClick={() => setSeverityRange({ min: 1, max: 10 })}
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
+                  </Badge>
+                )}
+                
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-600 hover:text-paypal-blue"
+                  onClick={handleClearFilters}
+                >
+                  Clear All
+                </Button>
+              </div>
+            )}
+
+            {/* Results Summary */}
+            <div className="mb-8">
+              <p className="text-gray-600 font-medium">
+                Showing {filteredScams.length} of {scams.length} scams
+                {searchQuery && ` for "${searchQuery}"`}
+              </p>
+            </div>
+
+            {/* Sort Options */}
+            <div className="flex items-center gap-4 mb-6">
+              <span className="text-sm text-gray-600 font-medium">Sort by:</span>
+              <div className="flex gap-2">
+                {[
+                  { key: 'date', label: 'Latest' },
+                  { key: 'fraudScore', label: 'Fraud Score' },
+                  { key: 'title', label: 'Title' }
+                ].map(option => (
+                  <Button
+                    key={option.key}
+                    variant={sortBy === option.key ? 'default' : 'outline'}
+                    size="sm"
+                    className={sortBy === option.key ? 'bg-gradient-paypal text-white' : ''}
+                    onClick={() => setSortBy(option.key as any)}
+                  >
+                    {option.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Scam Cards Grid */}
+            {filteredScams.length > 0 ? (
+              <div className="grid gap-8">
+                {filteredScams.map((scam) => (
+                  <ScamCard
+                    key={scam.id}
+                    scam={scam}
+                    onReportSimilar={handleReportSimilar}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16">
+                <div className="p-4 bg-gray-100 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                  <Shield className="text-gray-400 w-10 h-10" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">No scams found</h3>
+                <p className="text-gray-600 mb-6">
+                  Try adjusting your search terms or filters
+                </p>
+                <Button 
+                  className="bg-gradient-paypal hover:bg-paypal-blue-dark text-white px-6 py-3 rounded-xl"
+                  onClick={handleClearFilters}
+                >
+                  Clear Filters
+                </Button>
+              </div>
+            )}
+
+            {/* Trending Scams Section */}
+            {filteredScams.length === scams.length && (
+              <div className="mt-20">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">🔥 Trending Scams</h2>
+                <div className="grid gap-6">
+                  {getTrendingScams(scams, 3).map((scam) => (
+                    <ScamCard
+                      key={scam.id}
+                      scam={scam}
+                      onReportSimilar={handleReportSimilar}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
         )}
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border bg-card/30 mt-16">
-        <div className="max-w-6xl mx-auto px-4 py-8">
+      <footer className="border-t border-gray-200 bg-white mt-20">
+        <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="text-center">
-            <p className="text-sm text-muted-foreground">
-              ScamDex 2.0 - Protecting India from digital fraud through community awareness
+            <p className="text-sm text-gray-600 font-medium mb-2">
+              ScamDex 2.0 - Protecting India from Scams
             </p>
-            <p className="text-xs text-muted-foreground mt-2">
-              Report suspicious activities • Stay vigilant • Share knowledge
+            <p className="text-xs text-gray-500">
+              Data sourced from verified reports and official sources
             </p>
           </div>
         </div>

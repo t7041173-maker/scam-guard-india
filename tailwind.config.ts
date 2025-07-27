@@ -78,34 +78,22 @@ export default {
 					DEFAULT: 'hsl(var(--info))',
 					foreground: 'hsl(var(--info-foreground))'
 				},
-				// PayPal-style colors
-				'paypal-blue': 'hsl(var(--paypal-blue))',
-				'paypal-blue-dark': 'hsl(var(--paypal-blue-dark))',
-				'paypal-blue-light': 'hsl(var(--paypal-blue-light))',
-				'paypal-gray': 'hsl(var(--paypal-gray))',
-				'paypal-gray-dark': 'hsl(var(--paypal-gray-dark))',
 				// Tag colors
-				'tag-loan': 'hsl(var(--tag-loan))',
-				'tag-phishing': 'hsl(var(--tag-phishing))',
-				'tag-job': 'hsl(var(--tag-job))',
-				'tag-crypto': 'hsl(var(--tag-crypto))',
-				'tag-fake-offer': 'hsl(var(--tag-fake-offer))'
+				'tag-blue': 'hsl(var(--tag-blue))',
+				'tag-gray': 'hsl(var(--tag-gray))',
+				'tag-green': 'hsl(var(--tag-green))',
+				'tag-yellow': 'hsl(var(--tag-yellow))'
 			},
 			backgroundImage: {
 				'gradient-primary': 'var(--gradient-primary)',
-				'gradient-success': 'var(--gradient-success)',
 				'gradient-card': 'var(--gradient-card)'
 			},
 			boxShadow: {
 				'sm': 'var(--shadow-sm)',
 				'card': 'var(--shadow-card)',
-				'elevated': 'var(--shadow-elevated)',
-				'paypal': 'var(--shadow-paypal)'
+				'elevated': 'var(--shadow-elevated)'
 			},
-			transitionTimingFunction: {
-				'smooth': 'var(--transition-smooth)',
-				'bounce': 'var(--transition-bounce)'
-			},
+
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
