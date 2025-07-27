@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FraudScoreSlider } from "@/components/FraudScoreSlider";
 import { TagWithIcon } from "@/components/TagWithIcon";
 import { PlatformChip } from "@/components/PlatformChip";
-import { X, Upload, Shield, CheckCircle, AlertCircle, HelpCircle, Camera } from "lucide-react";
+import { HelpTooltip } from "@/components/HelpTooltip";
+import { X, Upload, Shield, CheckCircle, AlertCircle, Camera, ImagePlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface AddScamFormProps {
@@ -19,6 +20,8 @@ export const AddScamForm = ({ onClose, onSubmit }: AddScamFormProps) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [imageUploaded, setImageUploaded] = useState(false);
   
   const [formData, setFormData] = useState({
     title: "",
@@ -86,7 +89,7 @@ export const AddScamForm = ({ onClose, onSubmit }: AddScamFormProps) => {
 
     setIsSubmitting(true);
     
-    // Simulate API call
+    // Simulate API call with enhanced feedback
     setTimeout(() => {
       const scamData = {
         ...formData,
@@ -99,118 +102,152 @@ export const AddScamForm = ({ onClose, onSubmit }: AddScamFormProps) => {
 
       onSubmit(scamData);
       
-      toast({
-        title: "✅ Scam Report Submitted Successfully",
-        description: "Thank you for helping keep our community safe. Your report is being reviewed.",
-      });
-      
-      setIsSubmitting(false);
-      onClose();
+      setSubmitSuccess(true);
+      setTimeout(() => {
+        toast({
+          title: "✅ Scam Report Submitted Successfully",
+          description: "Thank you for helping keep our community safe. Your report is being reviewed.",
+        });
+        
+        setIsSubmitting(false);
+        onClose();
+      }, 1500);
     }, 2000);
+  };
+  
+  const handleImageUpload = () => {
+    // Simulate image upload
+    setImageUploaded(true);
+    setTimeout(() => setImageUploaded(false), 3000);
   };
 
   const ScamPreviewCard = () => (
-    <Card className="bg-gradient-card border border-paypal-blue/20 shadow-paypal">
-      <CardHeader className="pb-3">
-        <div className="flex items-center gap-2">
-          <Shield className="w-5 h-5 text-paypal-blue" />
-          <span className="text-sm font-medium text-muted-foreground">Preview</span>
-        </div>
-        <h3 className="font-semibold text-lg">{formData.title || "Your scam title"}</h3>
-        <div className="flex items-center gap-2">
-          <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-            fraudScore >= 70 ? 'bg-danger text-white' : 
-            fraudScore >= 30 ? 'bg-warning text-black' : 'bg-success text-white'
-          }`}>
-            {fraudScore}/100
+    <div className="animate-slide-up">
+      <Card className="bg-gradient-card border border-paypal-blue/20 shadow-paypal">
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-2">
+            <Shield className="w-5 h-5 text-paypal-blue" />
+            <span className="text-sm font-medium text-muted-foreground">Preview</span>
           </div>
-          <span className="text-sm text-muted-foreground">
-            {fraudScore >= 70 ? 'High Risk' : fraudScore >= 30 ? 'Moderate Risk' : 'Low Risk'}
-          </span>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          {selectedTags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {selectedTags.slice(0, 3).map((tag) => (
-                <TagWithIcon
-                  key={tag}
-                  tag={tag}
-                  selected={true}
-                  onToggle={() => {}}
-                />
-              ))}
+          <h3 className="font-semibold text-lg">{formData.title || "Your scam title"}</h3>
+          <div className="flex items-center gap-2">
+            <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+              fraudScore >= 70 ? 'bg-danger text-white' : 
+              fraudScore >= 30 ? 'bg-warning text-black' : 'bg-success text-white'
+            }`}>
+              {fraudScore}/100
             </div>
-          )}
-          {selectedPlatforms.length > 0 && (
-            <div className="text-sm">
-              <span className="font-medium">Platforms: </span>
-              <span className="text-muted-foreground">{selectedPlatforms.join(", ")}</span>
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+            <span className="text-sm text-muted-foreground">
+              {fraudScore >= 70 ? 'High Risk' : fraudScore >= 30 ? 'Moderate Risk' : 'Low Risk'}
+            </span>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {selectedTags.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {selectedTags.slice(0, 3).map((tag) => (
+                  <TagWithIcon
+                    key={tag}
+                    tag={tag}
+                    selected={true}
+                    onToggle={() => {}}
+                  />
+                ))}
+              </div>
+            )}
+            {selectedPlatforms.length > 0 && (
+              <div className="text-sm">
+                <span className="font-medium">Platforms: </span>
+                <span className="text-muted-foreground">{selectedPlatforms.join(", ")}</span>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 
   return (
     <div className="min-h-screen bg-background p-4 pb-20">
       <div className="max-w-2xl mx-auto space-y-6">
-        {/* Header */}
-        <Card className="bg-gradient-card shadow-paypal border-0">
-          <CardHeader className="text-center">
+        {/* Header with enhanced animations */}
+        <Card className="bg-gradient-card shadow-paypal border-0 animate-fade-in">
+          <CardHeader className="text-center relative">
             <div className="flex items-center justify-center gap-3 mb-2">
-              <div className="p-3 bg-paypal-blue/10 rounded-full">
-                <Shield className="w-8 h-8 text-paypal-blue" />
+              <div className={`p-3 rounded-full transition-all duration-500 ${
+                submitSuccess ? 'bg-success/20 animate-pulse-success' : 'bg-paypal-blue/10'
+              }`}>
+                {submitSuccess ? (
+                  <CheckCircle className="w-8 h-8 text-success animate-bounce-in" />
+                ) : (
+                  <Shield className="w-8 h-8 text-paypal-blue" />
+                )}
               </div>
             </div>
-            <CardTitle className="text-2xl font-bold text-card-foreground">Report a Scam</CardTitle>
-            <p className="text-muted-foreground">Help protect the community by sharing scam details</p>
-            <Button variant="ghost" size="icon" onClick={onClose} className="absolute top-4 right-4">
+            <CardTitle className={`text-2xl font-bold transition-all duration-300 ${
+              submitSuccess ? 'text-success' : 'text-card-foreground'
+            }`}>
+              {submitSuccess ? 'Report Submitted!' : 'Report a Scam'}
+            </CardTitle>
+            <p className="text-muted-foreground">
+              {submitSuccess 
+                ? 'Thank you for helping protect our community' 
+                : 'Help protect the community by sharing scam details'
+              }
+            </p>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={onClose} 
+              className="absolute top-4 right-4 hover:bg-red-50 hover:text-red-600"
+            >
               <X className="w-5 h-5" />
             </Button>
           </CardHeader>
         </Card>
 
-        {/* Main Form */}
-        <Card className="shadow-card border-border/50">
+        {/* Main Form with enhanced styling */}
+        <Card className="shadow-card border-border/50 animate-slide-up">
           <CardContent className="p-6">
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Scam Name */}
+              {/* Scam Name with tooltip */}
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <label className="text-sm font-medium text-card-foreground">Scam Name *</label>
-                  <HelpCircle className="w-4 h-4 text-muted-foreground" />
+                  <HelpTooltip content="Enter a clear, descriptive name for the scam (e.g., 'Fake investment app promising 20% returns')" />
                 </div>
                 <Input
                   placeholder="e.g., Fake investment app promising 20% returns"
                   value={formData.title}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  className="h-12 rounded-xl border-border/50 focus:border-paypal-blue focus:ring-paypal-blue/20"
+                  className="h-12 rounded-xl border-border/50 focus:border-paypal-blue focus:ring-paypal-blue/20 transition-all duration-300"
                 />
               </div>
 
-              {/* Scam Description */}
+              {/* Scam Description with tooltip */}
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <label className="text-sm font-medium text-card-foreground">Detailed Description *</label>
-                  <HelpCircle className="w-4 h-4 text-muted-foreground" />
+                  <HelpTooltip content="Provide detailed information about how the scam works, what they promise, how they contact victims, etc." />
                 </div>
                 <Textarea
                   placeholder="Describe how the scam works, what they promise, how they contact victims..."
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  className="min-h-[120px] rounded-xl border-border/50 focus:border-paypal-blue focus:ring-paypal-blue/20 resize-none"
+                  className="min-h-[120px] rounded-xl border-border/50 focus:border-paypal-blue focus:ring-paypal-blue/20 resize-none transition-all duration-300"
                 />
               </div>
 
-              {/* Fraud Score Slider */}
+              {/* Enhanced Fraud Score Slider */}
               <FraudScoreSlider value={fraudScore} onChange={setFraudScore} />
 
-              {/* Platform Selector */}
+              {/* Platform Selector with tooltip */}
               <div className="space-y-3">
-                <label className="text-sm font-medium text-card-foreground">Platform Used</label>
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium text-card-foreground">Platform Used</label>
+                  <HelpTooltip content="Select all platforms where this scam was encountered" />
+                </div>
                 <div className="flex flex-wrap gap-2">
                   {platforms.map((platform) => (
                     <PlatformChip
@@ -223,11 +260,14 @@ export const AddScamForm = ({ onClose, onSubmit }: AddScamFormProps) => {
                 </div>
               </div>
 
-              {/* Location */}
+              {/* Location with tooltip */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-card-foreground">Location</label>
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium text-card-foreground">Location</label>
+                  <HelpTooltip content="Select the state where this scam was reported" />
+                </div>
                 <Select value={formData.location} onValueChange={(value) => setFormData(prev => ({ ...prev, location: value }))}>
-                  <SelectTrigger className="h-12 rounded-xl border-border/50 focus:border-paypal-blue">
+                  <SelectTrigger className="h-12 rounded-xl border-border/50 focus:border-paypal-blue transition-all duration-300">
                     <SelectValue placeholder="Select state or city" />
                   </SelectTrigger>
                   <SelectContent className="max-h-48">
@@ -238,25 +278,38 @@ export const AddScamForm = ({ onClose, onSubmit }: AddScamFormProps) => {
                 </Select>
               </div>
 
-              {/* Attach Proof */}
+              {/* Enhanced Attach Proof */}
               <div className="space-y-3">
-                <label className="text-sm font-medium text-card-foreground">Attach Proof</label>
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium text-card-foreground">Attach Proof</label>
+                  <HelpTooltip content="Add evidence like news articles, screenshots, or other supporting documents" />
+                </div>
                 <div className="flex gap-3">
                   <Input
                     placeholder="Paste link to evidence or news article"
                     value={formData.evidence}
                     onChange={(e) => setFormData(prev => ({ ...prev, evidence: e.target.value }))}
-                    className="flex-1 h-12 rounded-xl border-border/50 focus:border-paypal-blue"
+                    className="flex-1 h-12 rounded-xl border-border/50 focus:border-paypal-blue transition-all duration-300"
                   />
-                  <Button type="button" variant="outline" className="h-12 px-4 rounded-xl border-border/50">
-                    <Camera className="w-4 h-4" />
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={handleImageUpload}
+                    className={`h-12 px-4 rounded-xl border-border/50 transition-all duration-300 ${
+                      imageUploaded ? 'bg-success/10 border-success text-success' : ''
+                    }`}
+                  >
+                    {imageUploaded ? <CheckCircle className="w-4 h-4" /> : <Camera className="w-4 h-4" />}
                   </Button>
                 </div>
               </div>
 
-              {/* Tags */}
+              {/* Enhanced Tags with tooltips */}
               <div className="space-y-3">
-                <label className="text-sm font-medium text-card-foreground">Categories * (Select all that apply)</label>
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium text-card-foreground">Categories * (Select all that apply)</label>
+                  <HelpTooltip content="Choose tags that best describe this scam type. Multiple selections help others find similar threats." />
+                </div>
                 <div className="flex flex-wrap gap-2">
                   {availableTags.map((tag) => (
                     <TagWithIcon
@@ -285,36 +338,49 @@ export const AddScamForm = ({ onClose, onSubmit }: AddScamFormProps) => {
                 </div>
               </div>
 
-              {/* Preview Toggle */}
+              {/* Enhanced Preview Toggle */}
               <div className="flex items-center justify-center pt-4">
                 <Button 
                   type="button" 
                   variant="ghost" 
                   onClick={() => setShowPreview(!showPreview)}
-                  className="text-paypal-blue hover:bg-paypal-blue/10"
+                  className="text-paypal-blue hover:bg-paypal-blue/10 transition-all duration-300 hover:scale-105"
                 >
-                  {showPreview ? 'Hide Preview' : 'Show Preview'}
+                  {showPreview ? '👁️ Hide Preview' : '👀 Show Preview'}
                 </Button>
               </div>
 
-              {/* Preview Card */}
+              {/* Animated Preview Card */}
               {showPreview && <ScamPreviewCard />}
 
-              {/* Submit Button */}
+              {/* Enhanced Submit Button with success animation */}
               <div className="pt-6">
                 <Button 
                   type="submit" 
-                  disabled={isSubmitting}
-                  className="w-full h-14 text-base font-semibold rounded-xl bg-gradient-primary shadow-paypal hover:opacity-90 transition-smooth disabled:opacity-50"
+                  disabled={isSubmitting || submitSuccess}
+                  className={`
+                    w-full h-14 text-base font-semibold rounded-xl transition-all duration-500 transform
+                    ${submitSuccess 
+                      ? 'bg-success text-success-foreground animate-pulse-success' 
+                      : 'bg-gradient-primary shadow-paypal hover:opacity-90 hover:scale-105 active:scale-95'
+                    }
+                    ${isSubmitting ? 'animate-pulse' : ''}
+                    disabled:opacity-50 disabled:scale-100
+                  `}
                 >
-                  {isSubmitting ? (
-                    <div className="flex items-center gap-2">
+                  {submitSuccess ? (
+                    <div className="flex items-center gap-2 animate-fade-in">
+                      <CheckCircle className="w-6 h-6 animate-bounce-in" />
+                      <span>Report Submitted Successfully!</span>
+                    </div>
+                  ) : isSubmitting ? (
+                    <div className="flex items-center gap-3">
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       <span>Submitting Report...</span>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5" />
+                      <Shield className="w-5 h-5" />
                       <span>Submit Scam Report</span>
                     </div>
                   )}
